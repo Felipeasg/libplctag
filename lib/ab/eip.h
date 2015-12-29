@@ -666,10 +666,10 @@ START_PACK typedef struct {
 	uint16_t cpf_conn_seq_num;      /* connection sequence ID, inc for each message */
 
 	/* CIP Service Info */
-	uint8_t service_code;           /* ALWAYS 0x4C, CIP_READ */
+//	uint8_t service_code;           /* ALWAYS 0x4C, CIP_READ */
 	/*uint8_t req_path_size;*/          /* path size in words */
-	uint8_t req_path[ZLA_SIZE];
-} END_PACK eip_cip_req_old;
+//	uint8_t req_path[ZLA_SIZE];
+} END_PACK eip_cip_co_req;
 
 
 
@@ -710,7 +710,7 @@ START_PACK typedef struct {
 
 	/* CIP Data*/
 	uint8_t resp_data[ZLA_SIZE];
-} END_PACK eip_cip_resp_old;
+} END_PACK eip_cip_co_resp;
 
 
 

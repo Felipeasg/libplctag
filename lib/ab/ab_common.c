@@ -197,10 +197,11 @@ plc_tag ab_tag_create(attr attribs)
     }
 
     /* handle the strange LGX->DH+->PLC5 case */
-    if(tag->use_dhp_direct) {
+    /* FIXME - all types need to be connected now */
+//    if(tag->use_dhp_direct) {
         /* this type of tag must use connected mode. */
         tag->needs_connection = 1;
-    }
+//    }
 
     /*
      * set up tag vtable.  This is protocol specific
