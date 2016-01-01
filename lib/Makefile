@@ -1,5 +1,5 @@
 #
-#   Copyright 2012, Process Control Engineers
+#   Copyright 2015, Process Control Engineers
 #   Author: Kyle Hayes
 #
 #    This library is free software; you can redistribute it and/or
@@ -30,10 +30,11 @@ ifeq ($(UNAME_S),Darwin)
     LIBPLC_LIB_SO=libplctag.dylib
 endif
 
-LIBPLC_LIB_SRC=libplctag_tag.c linux/platform.c util/attr.c \
-				ab/ab_common.c ab/cip.c ab/connection.c ab/eip.c \
-				ab/eip_cip.c ab/eip_dhp_pccc.c ab/eip_pccc.c ab/pccc.c \
-				ab/request.c ab/session.c
+LIBPLC_LIB_SRC=libplctag_tag.c \
+				ab/ab.c ab/common.c ab/connection.c ab/session.c \
+				ab/explicit/explicit.c \
+				linux/platform.c util/attr.c util/platform_ext.c
+
 LIBPLC_LIB_OBJ=$(LIBPLC_LIB_SRC:%.c=%.o)
 
 DESTDIR=/usr/local/

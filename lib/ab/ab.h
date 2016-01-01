@@ -31,11 +31,12 @@
 
 
 #include <libplctag.h>
+#include <libplctag_tag.h>
 #include <util/attr.h>
 
 
 
-plc_tag ab_tag_create(attr attribs);
+int ab_tag_create(plc_tag tag);
 
 
 #endif

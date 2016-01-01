@@ -25,21 +25,15 @@
  *                                                                        *
  **************************************************************************/
 
-
 #ifndef __LIBPLCTAG_TAG_H__
 #define __LIBPLCTAG_TAG_H__
-
-
-
 
 #include "libplctag.h"
 #include <platform.h>
 #include <util/attr.h>
 
-#define PLCTAG_CANARY (0xACA7CAFE)
-#define PLCTAG_DATA_LITTLE_ENDIAN	(0)
-#define PLCTAG_DATA_BIG_ENDIAN		(1)
-
+#define PLCTAG_DATA_LITTLE_ENDIAN (0)
+#define PLCTAG_DATA_BIG_ENDIAN (1)
 
 /*
  * plc_err
@@ -62,50 +56,36 @@
 #endif
 */
 
+struct plc_tag_t
+{
+    mutex_p mut;
 
+    /* all these fields are protected by the lock */
+    lock_t lock;
+    int status;
+    int read_requested;
+    int write_requested;
+    int abort_requested;
+    int destroy_requested;
+    uint64_t last_read_time_ms;  /* set by back end */
+    uint64_t last_write_time_ms; /* set by back end */
+    
+    /* information set at tag creation time */
+    int debug;
+    attr attribs; /* attributes for the tag. */
 
-/* define tag operation functions */
-typedef int (*tag_abort_func)(plc_tag tag);
-typedef int (*tag_destroy_func)(plc_tag tag);
-typedef int (*tag_read_func)(plc_tag);
-typedef int (*tag_status_func)(plc_tag);
-typedef int (*tag_write_func)(plc_tag tag);
+    /* how long to cache a read */
+    uint64_t read_cache_ms;
 
-/* we'll need to set these per protocol type. */
-struct tag_vtable_t {
-	tag_abort_func 			abort;
-	tag_destroy_func 		destroy;
-	tag_read_func			read;
-	tag_status_func 		status;
-	tag_write_func 			write;
+    /* protocol specific! */
+    int endian;
+    int backend_started;
+    void *impl_data;
+    int size; /* size in byte of the data */
+    uint8_t *data;
 };
 
-typedef struct tag_vtable_t *tag_vtable_p;
-
-
-/*
- * The base definition of the tag structure.  This is used
- * by the protocol-specific implementations.
- *
- * The base type only has a vtable for operations.
- */
-
-#define TAG_BASE_STRUCT tag_vtable_p vtable; \
-						mutex_p mut; \
-						int status; \
-						int endian; \
-						int debug; \
-						uint64_t read_cache_expire; \
-						uint64_t read_cache_ms; \
-						int size; \
-						uint8_t *data
-
-struct plc_tag_t {
-	TAG_BASE_STRUCT;
-};
-
-
-
-
+/* used by protocol implementations from the back end */
+extern int plc_tag_destroy_generic(plc_tag tag);
 
 #endif

@@ -18,20 +18,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef __AB_SESSION_H__
-#define __AB_SESSION_H__ 1
+/**************************************************************************
+ * CHANGE LOG                                                             *
+ *                                                                        *
+ * 2015-09-12  KRH - Created file.                                        *
+ *                                                                        *
+ **************************************************************************/
 
-#include <libplctag.h>
-#include <libplctag_tag.h>
-#include <platform.h>
+#ifndef __PLCTAG_AB_SESSION_H__
+#define __PLCTAG_AB_SESSION_H__ 1
 
-#define MAX_REQ_RESP_SIZE	(600) /* enough? */
+#include <ab/ab_common.h>
+#include <ab/request.h>
 
-
-/* struct to hold session information */
-typedef struct ab_session_t *ab_session_p;
-typedef struct ab_request_t *ab_request_p;
-typedef struct ab_connection_t *ab_connection_p; /* to get around circular .h includes */
+#define MAX_SESSION_HOST 	(128)
 
 struct ab_session_t {
 	ab_session_p next;
@@ -41,12 +41,9 @@ struct ab_session_t {
 	char host[MAX_SESSION_HOST];
 	int port;
 	sock_p sock;
-
-	int debug;
-    
-    lock_t lock;
-	//int is_connected;
+	int is_connected;
 	int status;
+	int debug;
 
 	/* registration info */
 	uint32_t session_handle;
@@ -61,7 +58,7 @@ struct ab_session_t {
 	ab_request_p requests;
 
 	/* counter for number of messages in flight */
-	//int num_reqs_in_flight;
+	int num_reqs_in_flight;
 
 	/* data for receiving messages */
 	uint64_t resp_seq_id;
@@ -69,64 +66,39 @@ struct ab_session_t {
 	int recv_offset;
 	uint8_t recv_data[MAX_REQ_RESP_SIZE];
 
+	/*int recv_size;*/
+
 	/* tags for this session */
-	int tag_count;
-    
-    /* state for the state machine */
-    int state;
+	ab_tag_p tags;
 
 	/* connections for this session */
 	ab_connection_p connections;
-    
 	uint32_t conn_serial_number; /* id for the next connection */
 };
 
-extern ab_session_p session_find_or_add(plc_tag tag);
-extern void session_inc_tag_count(ab_session_p session);
-extern void session_dec_tag_count(ab_session_p session);
+uint64_t session_get_new_seq_id_unsafe(ab_session_p sess);
+uint64_t session_get_new_seq_id(ab_session_p sess);
 
-/*
- * this structure contains data necessary to set up a request and hold
- * the resulting response.
- */
-
-struct ab_request_t {
-	ab_request_p next; 	/* for linked list */
-
-	int req_id; 		/* which request is this for the tag? */
-	int data_size; 		/* how many bytes did we get? */
-
-	/* flags for communicating with background thread */
-	int send_request;
-	int send_in_progress;
-	int resp_received;
-	int recv_in_progress;
-	int abort_request;
-	int abort_after_send; /* for one shot packets */
-
-	int status;
-	int debug;
-
-	/* used when processing a response */
-	int processed;
-
-	ab_session_p session;
-
-	uint64_t session_seq_id;
-	uint32_t conn_id;
-	uint16_t conn_seq;
-
-	/* used by the background thread for incrementally getting data */
-	int current_offset;
-	int request_size; /* total bytes, not just data */
-	uint8_t data[MAX_REQ_RESP_SIZE];
-};
-
-
-int request_create(ab_request_p *req);
-int request_add(ab_session_p sess, ab_request_p req);
-int request_remove(ab_session_p sess, ab_request_p req);
-int request_destroy(ab_request_p *req);
-
+int find_or_create_session(ab_session_p *session, attr attribs);
+int add_session_unsafe(ab_session_p n);
+int add_session(ab_session_p s);
+int remove_session_unsafe(ab_session_p n);
+int remove_session(ab_session_p s);
+ab_session_p find_session_by_host_unsafe(const char  *t);
+int session_add_connection_unsafe(ab_session_p session, ab_connection_p connection);
+int session_add_connection(ab_session_p session, ab_connection_p connection);
+int session_remove_connection_unsafe(ab_session_p session, ab_connection_p connection);
+int session_remove_connection(ab_session_p session, ab_connection_p connection);
+int session_add_tag_unsafe(ab_session_p session, ab_tag_p tag);
+int session_add_tag(ab_session_p session, ab_tag_p tag);
+int session_remove_tag_unsafe(ab_session_p session, ab_tag_p tag);
+int session_remove_tag(ab_session_p session, ab_tag_p tag);
+ab_session_p session_create_unsafe(int debug, const char* host, int gw_port);
+int session_connect(ab_session_p session, const char *host);
+int session_destroy_unsafe(ab_session_p session);
+int session_destroy(ab_session_p session);
+int session_is_empty(ab_session_p session);
+int session_register(ab_session_p session);
+int session_unregister(ab_session_p session);
 
 #endif

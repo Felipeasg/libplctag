@@ -54,18 +54,16 @@ extern "C" {
 	#define LIB_EXPORT extern
 #endif
 
+/* WARNING THIS IS MACHINE/COMPILER DEPENDENT!!!! */
+typedef float real32_t;
 
-	/* WARNING THIS IS MACHINE/COMPILER DEPENDENT!!!! */
-	typedef float real32_t;
+/* opaque type definitions */
+typedef struct plc_tag_t *plc_tag;
 
 
-	/* opaque type definitions */
-	typedef struct plc_tag_t *plc_tag;
 #define PLC_TAG_NULL ((plc_tag)NULL)
 
-
-
-	/* library internal status. */
+        /* library internal status. */
 #define PLCTAG_STATUS_PENDING		(1)
 #define PLCTAG_STATUS_OK			(0)
 

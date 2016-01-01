@@ -579,7 +579,7 @@ int session_check_incoming_data_unsafe(ab_session_p session)
              * field.  Use the PCCC sequence in those cases??  How do we tell?
              */
             if (encap->encap_command == AB_EIP_CONNECTED_SEND) {
-                eip_cip_co_generic_response* resp = (eip_cip_co_generic_response*)(session->recv_data);
+                eip_cip_co_req* resp = (eip_cip_co_req*)(session->recv_data);
 
                 /*pdebug(session->debug,"resp->cpf_targ_conn_id(%x) = tmp->conn_id(%x), resp->cpf_conn_seq_num(%x) = tmp->conn_seq(%u)",
                        resp->cpf_targ_conn_id,      tmp->conn_id,     resp->cpf_conn_seq_num,      tmp->conn_seq);*/
